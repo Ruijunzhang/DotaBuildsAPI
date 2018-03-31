@@ -1,0 +1,8 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Default path will just redirect to the computer list
+GET     /getMatchDetails/:id            controllers.HomeController.getMatchDetails(id:String)
+
+GET     /getRecentMatches/:id            controllers.HomeController.getRecentMatches(id:String)
