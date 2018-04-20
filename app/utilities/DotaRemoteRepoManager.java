@@ -2,18 +2,19 @@ package utilities;
 
 public class DotaRemoteRepoManager {
 
-    public String GetMatchApiRemoteUrl(String matchId)
-    {
+    public String getMatchApiRemoteUrl(String matchId) {
         return "https://api.opendota.com/api/matches/" + matchId;
     }
 
-    public String GetHerosApiRemoteUrl()
-    {
+    public String GetHerosApiRemoteUrl() {
         return "https://api.opendota.com/api/heroes";
     }
 
-    public String GetUserRecentMatchsById(String userId)
-    {
+    public String getUserRecentMatchsById(String userId) {
         return "https://api.opendota.com/api/players/" + userId + "/recentMatches";
+    }
+
+    public String getMatchReplayUrl(String matchId){
+        return "https://api.opendota.com/api/replays?match_id=" + matchId;
     }
 }

@@ -18,3 +18,5 @@ dist
 bin
 .DS_Store
 activator-sbt-*-shim.sbt
+sbt-dist/conf/sbtconfig.txt
+sbt-dist/conf/sbtopts
