@@ -30,7 +30,7 @@ public class DotaMatchRepository {
         return dotaRemoteRepository.getRecentMatches(dotaRemoteRepoManager.getUserRecentMatchsById(userId));
     }
 
-    public CompletionStage<File> getMatcheReplay(String matchId) throws IOException{
+    public File getMatcheReplay(String matchId) throws IOException{
         return dotaRemoteRepository.getMatchReplay();
     }
 }

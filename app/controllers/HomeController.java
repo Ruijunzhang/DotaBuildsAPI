@@ -39,11 +39,11 @@ public class HomeController extends Controller {
 
     }
 
-    public CompletionStage<Result> getMatchReplay(String matchId) throws IOException{
+    public Result getMatchReplay(String matchId) throws IOException{
 
-        File replay = dotaMatchRepository.getMatcheReplay(matchId).toCompletableFuture().join();
+        File replay = dotaMatchRepository.getMatcheReplay(matchId);
 
-        return dotaMatchRepository.getMatchDetails(matchId).thenApplyAsync(Results::ok, httpExecutionContext.current());
+        return ok( Long.toString((replay.length())));
     }
 }
             

@@ -53,14 +53,14 @@ public class DotaRemoteRepository {
          );
     }
 
-    public CompletionStage<File> getMatchReplay() throws IOException{
+    public File getMatchReplay() throws IOException{
 
-        String url = "http://replay136.valve.net/570/3825092637_1544200095.dem.bz2";
+        String url = "http://replay137.valve.net/570/3839616037_1262298148.dem.bz2";
 
         CompletionStage<WSResponse> futureResponse =
                 downloadClient.url(url).setMethod("GET").stream();
 
-        File file = File.createTempFile("stream", ".bz2", new File("C:\\Users\\ruijun\\Desktop\\replayDownload"));
+        File file = File.createTempFile("stream", "dem.bz2", new File("C:\\Users\\ruijun\\Desktop\\replayDownload"));
         OutputStream outputStream = java.nio.file.Files.newOutputStream(file.toPath());
 
         CompletionStage<File> downloadedFile = futureResponse.thenCompose(res -> {
@@ -79,7 +79,7 @@ public class DotaRemoteRepository {
                     }).thenApply(v -> file);
                 return result;
             });
-        return downloadedFile;
+        return downloadedFile.toCompletableFuture().join();
     }
 
     private List<Match> getMatchList(RecentMatches[] recentMatches){
