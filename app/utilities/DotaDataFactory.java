@@ -1,8 +1,7 @@
 package utilities;
 
 import models.Hero;
-import models.Heros;
-import models.RecentMatches;
+import models.Heroes;
 import play.libs.Json;
 import play.libs.ws.WSClient;
 import play.libs.ws.WSRequest;
@@ -19,12 +18,18 @@ public class DotaDataFactory {
     private final WSClient httpClient;
     private final DotaRemoteRepoManager dotaRemoteRepoManager;
     private final int defaultTimeout = 1000;
+    private final int radiantIndex = 5;
+    private final int downloadApiResponseLength = 5;
+    private final int downloadableApiResponseLength = 3;
+
 
     @Inject
     public DotaDataFactory(WSClient client, DotaRemoteRepoManager dotaRemoteRepoManager){
         this.httpClient = client;
         this.dotaRemoteRepoManager =dotaRemoteRepoManager;
     }
+
+
 
     public HashMap<Integer, Hero> getHeroMap(){
 
@@ -35,23 +40,30 @@ public class DotaDataFactory {
 
         heroMap = new HashMap<>();
 
-        WSRequest matchDetailsRequest = httpClient.url(dotaRemoteRepoManager.GetHerosApiRemoteUrl()).setRequestTimeout(Duration.of(defaultTimeout, ChronoUnit.MILLIS));
+        WSRequest matchDetailsRequest = httpClient.url(dotaRemoteRepoManager.getHeroesApiRemoteUrl()).setRequestTimeout(Duration.of(defaultTimeout, ChronoUnit.MILLIS));
 
-        CompletionStage<Heros[]> heros= matchDetailsRequest.get().thenApply(json ->
-                Json.fromJson(json.asJson(), Heros[].class)
+        CompletionStage<Heroes[]> heros= matchDetailsRequest.get().thenApply(json ->
+                Json.fromJson(json.asJson(), Heroes[].class)
         );
 
-        Heros[] herosArray = heros.toCompletableFuture().join();
+        Heroes[] heroesArray = heros.toCompletableFuture().join();
 
-        for(Heros hero : herosArray){
+        for(Heroes hero : heroesArray){
             Hero dotaBuildHero = new Hero(hero.getName(),hero.getId(), hero.getLocalizedName());
             heroMap.put(hero.getId(), dotaBuildHero);
         }
-
         return heroMap;
     }
 
     public int getRadiantIndex(){
-        return 5;
+        return radiantIndex;
+    }
+
+    public int getDownloadApiResponseLength() {
+        return downloadApiResponseLength;
+    }
+
+    public int getDownloadableApiResponseLength() {
+        return downloadableApiResponseLength;
     }
 }

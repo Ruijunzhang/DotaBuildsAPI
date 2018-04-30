@@ -1,6 +1,5 @@
 package controllers;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import play.libs.concurrent.HttpExecutionContext;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -11,7 +10,6 @@ import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.CompletionStage;
-import java.util.concurrent.TimeUnit;
 
 
 public class HomeController extends Controller {
@@ -41,7 +39,7 @@ public class HomeController extends Controller {
 
     public CompletionStage<Result> getMatchReplay(String matchId) throws IOException{
 
-        File replay = dotaMatchRepository.getMatcheReplay(matchId).toCompletableFuture().join();
+        File replay = dotaMatchRepository.getMatchesReplay(matchId).toCompletableFuture().join();
 
         return dotaMatchRepository.getMatchDetails(matchId).thenApplyAsync(Results::ok, httpExecutionContext.current());
     }

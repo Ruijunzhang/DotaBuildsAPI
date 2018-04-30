@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
         "roles",
         "legs"
 })
-public class Heros implements Serializable
+public class Heroes implements Serializable
 {
 
     @JsonProperty("id")

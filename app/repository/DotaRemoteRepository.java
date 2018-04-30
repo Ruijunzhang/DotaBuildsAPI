@@ -2,12 +2,11 @@ package repository;
 
 import akka.util.ByteString;
 import com.fasterxml.jackson.databind.JsonNode;
-import models.Hero;
-import models.Match;
-import models.RecentMatches;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import models.*;
 import play.libs.Json;
 import play.libs.ws.*;
-import scala.compat.java8.FutureConverters;
+import utilities.DataProcessor;
 import utilities.DotaDataFactory;
 
 import javax.inject.Inject;
@@ -18,7 +17,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
-import java.util.concurrent.TimeUnit;
 
 import akka.stream.Materializer;
 import akka.stream.javadsl.*;
@@ -26,61 +24,73 @@ import akka.stream.javadsl.*;
 public class DotaRemoteRepository {
 
     private final WSClient httpClient;
-    private final WSClient downloadClient;
-    private final Materializer materializer;
     private final DotaDataFactory dotaDataFactory;
-    private final int defaultTimeout = 1000;
+    private final DataProcessor dataProcessor;
+    private final int defaultTimeout = 2000;
 
     @Inject
-    public DotaRemoteRepository(WSClient ws, WSClient downloadClient, DotaDataFactory dotaDataFactory, Materializer materializer) {
+    public DotaRemoteRepository(WSClient ws, DotaDataFactory dotaDataFactory, DataProcessor dataProcessor) {
         this.httpClient = ws;
-        this.downloadClient = downloadClient;
         this.dotaDataFactory = dotaDataFactory;
-        this.materializer = materializer;
+        this.dataProcessor = dataProcessor;
     }
 
-    public CompletionStage<JsonNode> getMatchDetails(String repoAddress){
+    public CompletionStage<JsonNode> getMatchDetails(String remoteApiUrl){
 
-        WSRequest matchDetailsRequest = httpClient.url(repoAddress).setRequestTimeout(Duration.of(defaultTimeout, ChronoUnit.MILLIS));
+        WSRequest matchDetailsRequest = httpClient.url(remoteApiUrl).setRequestTimeout(Duration.of(defaultTimeout, ChronoUnit.MILLIS));
         return matchDetailsRequest.get().thenApply(WSResponse::asJson);
     }
 
-    public CompletionStage<JsonNode> getRecentMatches(String userId){
-        WSRequest matchDetailsRequest = httpClient.url(userId).setRequestTimeout(Duration.of(defaultTimeout, ChronoUnit.MILLIS));
+    public CompletionStage<JsonNode> getRecentMatches(String remoteApiUrl){
+        WSRequest matchDetailsRequest = httpClient.url(remoteApiUrl).setRequestTimeout(Duration.of(defaultTimeout, ChronoUnit.MILLIS));
 
         return matchDetailsRequest.get().thenApply(json ->
                 Json.toJson(getMatchList(Json.fromJson(json.asJson(), RecentMatches[].class)))
          );
     }
 
-    public CompletionStage<File> getMatchReplay() throws IOException{
+    public CompletionStage<List<? super AccessibleReplayInfo>> getMatchesReplayDownloadInfo(String matchId){
 
-        String url = "http://replay136.valve.net/570/3825092637_1544200095.dem.bz2";
+        WSRequest matchReplayDownloadInfoRequest = httpClient.url(matchId).setRequestTimeout(Duration.of(defaultTimeout, ChronoUnit.MILLIS));
 
-        CompletionStage<WSResponse> futureResponse =
-                downloadClient.url(url).setMethod("GET").stream();
-
-        File file = File.createTempFile("stream", ".bz2", new File("C:\\Users\\ruijun\\Desktop\\replayDownload"));
-        OutputStream outputStream = java.nio.file.Files.newOutputStream(file.toPath());
-
-        CompletionStage<File> downloadedFile = futureResponse.thenCompose(res -> {
-
-            Source<ByteString, ?> responseBody = res.getBodyAsSource();
-
-            Sink<ByteString, CompletionStage<akka.Done>> outputWriter =
-                    Sink.<ByteString>foreach(bytes -> outputStream.write(bytes.toArray()));
-
-            CompletionStage<File> result = responseBody.runWith(outputWriter, materializer)
-                    .whenComplete((value, error) -> {
-                        try {
-                            outputStream.close();
-                        } catch (IOException e) {
-                        }
-                    }).thenApply(v -> file);
-                return result;
-            });
-        return downloadedFile;
+        return matchReplayDownloadInfoRequest.get().thenApply(json ->
+                getReplaysDownLoadInfos(json.asJson())
+        );
     }
+
+    public List<CompletionStage<File>> getMatchReplay(List<? super AccessibleReplayInfo> replayInfoList) throws IOException{
+
+        List<CompletionStage<File>> replayList = new ArrayList<>();
+
+        for(Object object : replayInfoList) {
+            AccessibleReplayInfo replayInfo = (AccessibleReplayInfo) object;
+            replayList.add(dataProcessor.downloadReplay(replayInfo));
+        }
+
+        return replayList;
+    }
+
+    private List<? super AccessibleReplayInfo> getReplaysDownLoadInfos(JsonNode jsonNode){
+
+        List<? super AccessibleReplayInfo> replayInfos = new ArrayList<>();
+
+        if(jsonNode.isArray()){
+            ArrayNode jsonNodeArray = (ArrayNode)jsonNode;
+            for (JsonNode node : jsonNodeArray)
+            {
+                if(node.size() == dotaDataFactory.getDownloadableApiResponseLength()){
+                    AccessibleReplayInfo replayInfo = Json.fromJson(node, AccessibleReplayInfo.class);
+                    replayInfos.add(replayInfo);
+                }
+                if(node.size() == dotaDataFactory.getDownloadApiResponseLength()){
+                    ReplayInfo replayInfo = Json.fromJson(node, ReplayInfo.class);
+                    replayInfos.add(replayInfo);
+                }
+            }
+        }
+        return replayInfos;
+    }
+
 
     private List<Match> getMatchList(RecentMatches[] recentMatches){
         List<Match> matchList = new ArrayList<>();

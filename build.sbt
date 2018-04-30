@@ -13,6 +13,9 @@ libraryDependencies += jdbc
 libraryDependencies += ws
 libraryDependencies += "com.h2database" % "h2" % "1.4.196"
 
+// https://mvnrepository.com/artifact/org.apache.commons/commons-compress
+libraryDependencies += "org.apache.commons" % "commons-compress" % "1.16.1"
+
 // https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
 libraryDependencies += "org.xerial" % "sqlite-jdbc" % "3.20.0"
 
