@@ -1,9 +1,12 @@
 package repository;
 
-import akka.util.ByteString;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import models.*;
+import org.apache.commons.compress.compressors.CompressorException;
+import org.apache.commons.compress.compressors.CompressorInputStream;
+import org.apache.commons.compress.compressors.CompressorStreamFactory;
+import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 import play.libs.Json;
 import play.libs.ws.*;
 import utilities.DataProcessor;
@@ -11,15 +14,14 @@ import utilities.DotaDataFactory;
 
 import javax.inject.Inject;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
-
-import akka.stream.Materializer;
-import akka.stream.javadsl.*;
 
 public class DotaRemoteRepository {
 
@@ -58,7 +60,12 @@ public class DotaRemoteRepository {
         );
     }
 
-    public List<CompletionStage<File>> getMatchReplay(List<? super AccessibleReplayInfo> replayInfoList) throws IOException{
+    public List<File> getUncompressedMatchReplay(List<? super AccessibleReplayInfo> replayInfoList)throws IOException{
+        return dataProcessor.unCompressingReplayAsync(getMatchReplay(replayInfoList));
+    }
+
+
+    private List<CompletionStage<File>> getMatchReplay(List<? super AccessibleReplayInfo> replayInfoList) throws IOException{
 
         List<CompletionStage<File>> replayList = new ArrayList<>();
 
@@ -66,7 +73,6 @@ public class DotaRemoteRepository {
             AccessibleReplayInfo replayInfo = (AccessibleReplayInfo) object;
             replayList.add(dataProcessor.downloadReplay(replayInfo));
         }
-
         return replayList;
     }
 
@@ -90,7 +96,6 @@ public class DotaRemoteRepository {
         }
         return replayInfos;
     }
-
 
     private List<Match> getMatchList(RecentMatches[] recentMatches){
         List<Match> matchList = new ArrayList<>();

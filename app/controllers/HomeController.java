@@ -5,10 +5,12 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Results;
 import repository.DotaMatchRepository;
+import utilities.DataProcessor;
 
 import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.CompletionStage;
 
 
@@ -16,12 +18,14 @@ public class HomeController extends Controller {
 
     private final HttpExecutionContext httpExecutionContext;
     private final DotaMatchRepository dotaMatchRepository;
+    private final DataProcessor dataProcessor;
 
     @Inject
     public HomeController(DotaMatchRepository dotaMatchRepository,
-                          HttpExecutionContext httpExecutionContext) {
+                          HttpExecutionContext httpExecutionContext, DataProcessor dataProcessor) {
         this.dotaMatchRepository = dotaMatchRepository;
         this.httpExecutionContext = httpExecutionContext;
+        this.dataProcessor = dataProcessor;
     }
 
 
@@ -39,8 +43,7 @@ public class HomeController extends Controller {
 
     public CompletionStage<Result> getMatchReplay(String matchId) throws IOException{
 
-        File replay = dotaMatchRepository.getMatchesReplay(matchId).toCompletableFuture().join();
-
+        List<File> replay = dotaMatchRepository.getMatchesReplay(matchId);
         return dotaMatchRepository.getMatchDetails(matchId).thenApplyAsync(Results::ok, httpExecutionContext.current());
     }
 }

@@ -32,10 +32,12 @@ public class DotaMatchRepository {
         return dotaRemoteRepository.getRecentMatches(dotaRemoteRepoManager.getUserRecentMatchsById(userId));
     }
 
-    public CompletionStage<File> getMatchesReplay(String matchId) throws IOException{
+    public List<File> getMatchesReplay(String matchId) throws IOException{
 
-        List<? super AccessibleReplayInfo> downloadUrls = dotaRemoteRepository.getMatchesReplayDownloadInfo(dotaRemoteRepoManager.getMatchReplayUrl(matchId)).toCompletableFuture().join();
+        List<? super AccessibleReplayInfo> downloadUrls = dotaRemoteRepository.getMatchesReplayDownloadInfo(
+                dotaRemoteRepoManager.getMatchReplayUrl(matchId)
+        ).toCompletableFuture().join();
 
-        return dotaRemoteRepository.getMatchReplay(downloadUrls).get(0);
+        return dotaRemoteRepository.getUncompressedMatchReplay(downloadUrls);
     }
 }
