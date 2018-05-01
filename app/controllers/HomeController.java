@@ -18,14 +18,12 @@ public class HomeController extends Controller {
 
     private final HttpExecutionContext httpExecutionContext;
     private final DotaMatchRepository dotaMatchRepository;
-    private final DataProcessor dataProcessor;
 
     @Inject
     public HomeController(DotaMatchRepository dotaMatchRepository,
                           HttpExecutionContext httpExecutionContext, DataProcessor dataProcessor) {
         this.dotaMatchRepository = dotaMatchRepository;
         this.httpExecutionContext = httpExecutionContext;
-        this.dataProcessor = dataProcessor;
     }
 
 
