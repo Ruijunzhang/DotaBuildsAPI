@@ -64,7 +64,6 @@ public class DotaRemoteRepository {
         return dataProcessor.unCompressingReplayAsync(getMatchReplay(replayInfoList));
     }
 
-
     private List<CompletionStage<File>> getMatchReplay(List<? super AccessibleReplayInfo> replayInfoList) throws IOException{
 
         List<CompletionStage<File>> replayList = new ArrayList<>();

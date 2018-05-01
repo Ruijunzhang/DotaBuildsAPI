@@ -8,7 +8,6 @@ import akka.util.ByteString;
 import com.typesafe.config.Config;
 import models.AccessibleReplayInfo;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
-import play.libs.F;
 import play.libs.ws.WSClient;
 import play.libs.ws.WSResponse;
 
@@ -64,21 +63,6 @@ public class DataProcessor {
         out.close();
         bzIn.close();
         return Paths.get(file.toPath().toString().replace(".bz2", "")).toFile();
-    }
-
-    public void unCompressingReplay() throws IOException {
-
-        InputStream fin = Files.newInputStream(Paths.get("C:\\Users\\ruijun\\Desktop\\replayDownload\\3853797312.dem.bz2"));
-        BufferedInputStream in = new BufferedInputStream(fin);
-        OutputStream out = Files.newOutputStream(Paths.get("C:\\Users\\ruijun\\Desktop\\replayDownload\\3853797312.dem"));
-        BZip2CompressorInputStream bzIn = new BZip2CompressorInputStream(in);
-        final byte[] buffer = new byte[unCompressingBufferSize];
-        int n = 0;
-        while (-1 != (n = bzIn.read(buffer))) {
-            out.write(buffer, 0, n);
-        }
-        out.close();
-        bzIn.close();
     }
 
     public CompletionStage<File> downloadReplay(AccessibleReplayInfo accessibleReplayInfo)throws IOException{

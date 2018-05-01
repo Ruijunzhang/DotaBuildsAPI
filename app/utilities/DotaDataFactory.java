@@ -30,7 +30,6 @@ public class DotaDataFactory {
     }
 
 
-
     public HashMap<Integer, Hero> getHeroMap(){
 
         return  heroMap == null ? buildHeroMap() : heroMap;
