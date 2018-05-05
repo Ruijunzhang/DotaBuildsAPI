@@ -9,3 +9,5 @@ GET     /getMatchDetails/:id            controllers.HomeController.getMatchDetai
 GET     /getRecentMatches/:id           controllers.HomeController.getRecentMatches(id:String)
 
 GET     /getMatchReplay/:id             controllers.HomeController.getMatchReplay(id:String)
+
+GET     /getMatchBuilds/:id             controllers.HomeController.getMatchBuildsInfo(id:String)

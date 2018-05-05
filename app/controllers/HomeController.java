@@ -39,6 +39,12 @@ public class HomeController extends Controller {
 
     }
 
+    public CompletionStage<Result> getMatchBuildsInfo(String matchId)throws IOException{
+
+        return dotaMatchRepository.getDotaBuildsInfo(matchId).thenApplyAsync(Results::ok, httpExecutionContext.current());
+
+    }
+
     public CompletionStage<Result> getMatchReplay(String matchId) throws IOException{
 
         List<File> replay = dotaMatchRepository.getMatchesReplay(matchId);

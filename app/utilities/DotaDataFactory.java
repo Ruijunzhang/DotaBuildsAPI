@@ -48,7 +48,7 @@ public class DotaDataFactory {
         Heroes[] heroesArray = heros.toCompletableFuture().join();
 
         for(Heroes hero : heroesArray){
-            Hero dotaBuildHero = new Hero(hero.getName(),hero.getId(), hero.getLocalizedName());
+            Hero dotaBuildHero = new Hero(hero.getName(), hero.getId(), hero.getLocalizedName());
             heroMap.put(hero.getId(), dotaBuildHero);
         }
         return heroMap;
