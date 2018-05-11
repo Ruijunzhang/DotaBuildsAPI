@@ -1,7 +1,7 @@
 package utilities;
 
-import models.Hero;
-import models.Heroes;
+import models.dtos.Hero;
+import models.dtos.Heroes;
 import play.libs.Json;
 import play.libs.ws.WSClient;
 import play.libs.ws.WSRequest;

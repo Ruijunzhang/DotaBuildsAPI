@@ -1,4 +1,4 @@
-package models;
+package models.dtos;
 
 import java.io.Serializable;
 import java.util.HashMap;

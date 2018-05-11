@@ -3,14 +3,17 @@ package repository;
 import com.fasterxml.jackson.databind.JsonNode;
 import javax.inject.Inject;
 
-import models.AccessibleReplayInfo;
+import io.ebean.text.json.EJson;
+import models.dtos.AccessibleReplayInfo;
 import models.dtos.ReplayBuildsInfo;
+import models.entities.MatchEntity;
 import replay.analyzer.Analyzer;
 import utilities.DotaRemoteRepoManager;
 import play.libs.Json;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
@@ -39,8 +42,18 @@ public class DotaMatchRepository {
 
     public CompletionStage<JsonNode> getDotaBuildsInfo(String matchId) throws IOException{
 
-        if (dotaLocalRepository.containsReplay(matchId)) {
-            return CompletableFuture.completedFuture(Json.toJson(new Analyzer().getReplayBuildsInfoList(dotaLocalRepository.getReplay(matchId))));
+        if (dotaLocalRepository.containsReplay(Long.parseLong(matchId))) {
+//            JsonNode buildsInfoJson = Json.toJson(new Analyzer().getReplayBuildsInfoList(dotaLocalRepository.getReplay(matchId)));
+//            MatchEntity  matchEntity = new MatchEntity();
+//            matchEntity.id = Long.parseLong(matchId);
+//            matchEntity.buildsInfo = EJson.parseObject(buildsInfoJson.toString());
+//            matchEntity.replayFilePath = dotaLocalRepository.getReplay(matchId);
+//            dotaLocalRepository.saveMatchEntity(matchEntity);
+
+            return dotaLocalRepository.getMatchEntityByMatchId(Long.parseLong(matchId)).thenApply(match ->
+                  Json.toJson(match.buildsInfo)
+            );
+//            return CompletableFuture.completedFuture(buildsInfoJson);
         }else{
             return CompletableFuture.supplyAsync(() -> Json.toJson(new ReplayBuildsInfo()));
         }

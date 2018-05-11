@@ -20,3 +20,5 @@ bin
 activator-sbt-*-shim.sbt
 sbt-dist/conf/sbtconfig.txt
 sbt-dist/conf/sbtopts
+conf/evolutions/default/1.sql
+dota_builds_repo.db

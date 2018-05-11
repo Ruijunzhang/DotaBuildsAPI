@@ -2,7 +2,7 @@ package repository;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import models.*;
+import models.dtos.*;
 import play.libs.Json;
 import play.libs.ws.*;
 import utilities.DataProcessor;
@@ -10,8 +10,6 @@ import utilities.DotaDataFactory;
 
 import javax.inject.Inject;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;

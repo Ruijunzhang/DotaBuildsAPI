@@ -6,7 +6,7 @@ import akka.stream.javadsl.Sink;
 import akka.stream.javadsl.Source;
 import akka.util.ByteString;
 import com.typesafe.config.Config;
-import models.AccessibleReplayInfo;
+import models.dtos.AccessibleReplayInfo;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 import play.libs.ws.WSClient;
 import play.libs.ws.WSResponse;

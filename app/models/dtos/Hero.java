@@ -1,4 +1,4 @@
-package models;
+package models.dtos;
 
 public class Hero {
 

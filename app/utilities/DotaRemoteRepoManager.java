@@ -1,10 +1,6 @@
 package utilities;
 
-import models.AccessibleReplayInfo;
-import models.ReplayInfo;
-
-import java.util.ArrayList;
-import java.util.List;
+import models.dtos.AccessibleReplayInfo;
 
 public class DotaRemoteRepoManager {
 
