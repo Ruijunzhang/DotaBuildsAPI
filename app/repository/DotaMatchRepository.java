@@ -4,8 +4,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import javax.inject.Inject;
 
 import io.ebean.text.json.EJson;
+import models.builders.ExpiredMatchEntityBuilder;
+import models.builders.MatchEntityBuilder;
 import models.dtos.AccessibleReplayInfo;
 import models.dtos.ReplayBuildsInfo;
+import models.entities.ExpiredMatchEntity;
 import models.entities.MatchEntity;
 import replay.analyzer.Analyzer;
 import utilities.DotaRemoteRepoManager;
@@ -42,20 +45,39 @@ public class DotaMatchRepository {
 
     public CompletionStage<JsonNode> getDotaBuildsInfo(String matchId) throws IOException{
 
-        if (dotaLocalRepository.containsReplay(Long.parseLong(matchId))) {
-//            JsonNode buildsInfoJson = Json.toJson(new Analyzer().getReplayBuildsInfoList(dotaLocalRepository.getReplay(matchId)));
-//            MatchEntity  matchEntity = new MatchEntity();
-//            matchEntity.id = Long.parseLong(matchId);
-//            matchEntity.buildsInfo = EJson.parseObject(buildsInfoJson.toString());
-//            matchEntity.replayFilePath = dotaLocalRepository.getReplay(matchId);
-//            dotaLocalRepository.saveMatchEntity(matchEntity);
+        if (dotaLocalRepository.containsReplay(Long.parseLong(matchId))) { ;
 
             return dotaLocalRepository.getMatchEntityByMatchId(Long.parseLong(matchId)).thenApply(match ->
                   Json.toJson(match.buildsInfo)
             );
-//            return CompletableFuture.completedFuture(buildsInfoJson);
-        }else{
+
+        }else if(dotaLocalRepository.containsExpiredReplay(Long.parseLong(matchId))){
+
             return CompletableFuture.supplyAsync(() -> Json.toJson(new ReplayBuildsInfo()));
+
+        } else {
+
+            List<File> replays = getMatchesReplay(matchId);
+
+            if(replays.get(0).length()/(1024*1024) > 10){
+
+                JsonNode buildsInfoJson = Json.toJson(new Analyzer().getReplayBuildsInfoList(dotaLocalRepository.getReplay(matchId)));
+
+                MatchEntity matchEntity = new MatchEntityBuilder().matchId(Long.parseLong(matchId))
+                        .replayFilePath(dotaLocalRepository.getReplay(matchId))
+                        .buildsInfo(EJson.parseObject(buildsInfoJson.toString())).buildMatchEntity();
+
+                dotaLocalRepository.saveMatchEntity(matchEntity);
+
+                return CompletableFuture.completedFuture(buildsInfoJson);
+            }else {
+
+                ExpiredMatchEntity expiredMatchEntity = new ExpiredMatchEntityBuilder().matchId(Long.parseLong(matchId)).buildExpiredMatchEntity();
+
+                dotaLocalRepository.saveExpiredMatchEntity(expiredMatchEntity);
+
+                return CompletableFuture.supplyAsync(() -> Json.toJson(new ReplayBuildsInfo()));
+            }
         }
     }
 

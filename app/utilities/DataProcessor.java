@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
 
+import static java.util.concurrent.CompletableFuture.supplyAsync;
+
 public class DataProcessor {
 
     private final WSClient httpClient;
@@ -33,20 +35,34 @@ public class DataProcessor {
         this.config = config;
     }
 
+//    public List<File> unCompressingReplayAsync(List<CompletionStage<File>> fileCompletionStageList) throws IOException {
+//
+//        List<File> fileList = new ArrayList<>();
+//
+//        for(CompletionStage<File> fileCompletionStage : fileCompletionStageList){
+//            fileCompletionStage.whenComplete((file, error) -> {
+//                try{
+//                    fileList.add(unCompressingReplayFile(file));
+//                }catch (IOException e){
+//                }
+//            });
+//        }
+//        return fileList;
+//    }
+
     public List<File> unCompressingReplayAsync(List<CompletionStage<File>> fileCompletionStageList) throws IOException {
 
-        List<File> fileList = new ArrayList<>();
+            List<File> fileList = new ArrayList<>();
 
-        for(CompletionStage<File> fileCompletionStage : fileCompletionStageList){
-
-            fileCompletionStage.whenComplete((file, error) -> {
-                try{
-                    fileList.add(unCompressingReplayFile(file));
-                }catch (IOException e){
-                }
-            });
-        }
-        return fileList;
+            for(CompletionStage<File> fileCompletionStage : fileCompletionStageList){
+                fileCompletionStage.whenComplete((file, error) -> {
+                    try{
+                        unCompressingReplayFile(file);
+                    }catch (IOException e){
+                    }
+                }).thenApply(fileList::add).toCompletableFuture().join();
+            }
+            return fileList;
     }
 
     public File unCompressingReplayFile(File file) throws IOException {

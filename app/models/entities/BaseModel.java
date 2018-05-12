@@ -10,4 +10,8 @@ public class BaseModel extends Model {
     @Id
     @Column(name = "match_id")
     public Long id;
+
+    public BaseModel(Long id){
+        this.id = id;
+    }
 }

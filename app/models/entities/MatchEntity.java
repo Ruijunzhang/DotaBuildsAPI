@@ -16,4 +16,10 @@ public class MatchEntity extends BaseModel{
 
     @DbJson
     public Map<String,Object> buildsInfo;
+
+    public MatchEntity(Long matchId, String replayFilePath, Map<String,Object> buildsInfo){
+        super(matchId);
+        this.replayFilePath = replayFilePath;
+        this.buildsInfo = buildsInfo;
+    }
 }
